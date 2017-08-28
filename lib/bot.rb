@@ -15,7 +15,7 @@ def bot(payload)
     response = request.converse_text(message.content, conversation_token: message.sender_id)
 
     if response.intent.slug == "reco_recette"
-      url = 'http://localhost:3000/api/v1/suggest'
+      url = 'https://www.foodmama.fr/api/v1/suggest'
       suggest_serialized = open(url).read
       suggest = JSON.parse(suggest_serialized)
 
@@ -28,7 +28,7 @@ def bot(payload)
                 buttons: [
                   {
                     title: 'Voir plus',
-                    value: "http://localhost:3000#{recipe['recipeUrl']}",
+                    value: "https://www.foodmama.fr#{recipe['recipeUrl']}",
                     type: 'web_url',
                   },
                   {
