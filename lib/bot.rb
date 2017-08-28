@@ -27,9 +27,14 @@ def bot(payload)
                 imageUrl: "#{recipe["imageUrl"]}",
                 buttons: [
                   {
-                    title: 'Voir la recette',
+                    title: 'Voir plus',
                     value: "http://localhost:3000#{recipe['recipeUrl']}",
                     type: 'web_url',
+                  },
+                  {
+                    type: 'postback',
+                    title: 'Faire cette recette',
+                    value: 'SELECT_RECIPE'
                   }
                 ]
               }
