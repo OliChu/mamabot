@@ -19,8 +19,21 @@ def bot(payload)
       connect.send_message(messages, message.conversation_id)
     elsif response.intent.slug
       if response.intent.slug == "reco_recette" || message.content == "SUGGEST_RECIPE"
-        messages = send_suggestions
+        username = URI.escape(message.message["data"]["userName"])
+        sender_id = message.sender_id
+        messages = send_suggestions(username, sender_id)
         connect.send_message(messages, message.conversation_id)
+        # messages = suggest_quick_replies
+        # connect.send_message(messages, message.conversation_id)
+
+      elsif response.intent.slug == "recette-ingredients"
+        query = []
+        ingredients = response.entities.select { |entity| entity.name == "ingredient" }
+        ingredients.each { |entity| query << "ingredients[]=#{entity.value}" }
+        query = query.join("&")
+        messages = search_food(query)
+        connect.send_message(messages, message.conversation_id)
+
       else
         replies = response.replies.map{ |r| { type: 'text', content: r } }
         connect.send_message(replies, message.conversation_id)
@@ -31,10 +44,49 @@ def bot(payload)
   200
 end
 
-def send_suggestions
-  url = 'https://www.foodmama.fr/api/v1/suggest'
+def send_suggestions(username, sender_id)
+  url = "https://www.foodmama.fr/api/v1/suggest?sender_id=#{sender_id}&userName=#{username}"
   suggest_serialized = open(url).read
   suggest = JSON.parse(suggest_serialized)
+  content = []
+  suggest["recipes"].each do |recipe|
+          content << {
+            title: "#{recipe["title"]}",
+            imageUrl: "#{recipe["imageUrl"]}",
+            buttons: [
+              {
+                title: 'Voir plus',
+                value: "https://www.foodmama.fr#{recipe['recipeUrl']}",
+                type: 'web_url'
+              },
+              {
+                type: 'postback',
+                title: 'Faire cette recette',
+                value: "http://www.foodmama.fr/api/v1/search?ingredients[]=#{recipe["title"]}"
+              }
+            ]
+          }
+  end
+  if content.blank?
+     messages = [
+      {
+        type: 'text',
+        content: "Oops, Mama n'a rien pour cette recherche"
+      }
+    ]
+  else messages = [
+          {
+            type: 'carousel',
+            content: content
+          }
+        ]
+  end
+end
+
+def search_food(query)
+  url = "http://www.foodmama.fr/api/v1/search?#{query}"
+  search_serialized = open(url).read
+  suggest = JSON.parse(search_serialized)
   content = []
   suggest["recipes"].each do |recipe|
           content << {
@@ -61,6 +113,26 @@ def send_suggestions
     }
   ]
 end
+
+# def suggest_quick_replies
+#   messages = [
+#     {
+#       type: 'quickReplies',
+#       content: {
+#         title: '',
+#         buttons: [
+#           {
+#             title: 'Autres suggestions',
+#             value: 'SUGGEST_RECIPE',
+#           }, {
+#             title: 'Chercher',
+#             value: 'SUGGEST_RECIPE',
+#           }
+#         ]
+#       }
+#     }
+#   ]
+# end
 
 def select_food(message)
   url = URI.escape(message.content)
