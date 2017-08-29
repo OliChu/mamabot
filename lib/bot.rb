@@ -72,7 +72,7 @@ def select_food(message)
   messages = [
     {
       type: 'text',
-      content: food_title + ":" + "\n" + food_ingredients
+      content: food_title + ":\n(🍴 2 pers.)\n" + food_ingredients
     }
   ]
 end
