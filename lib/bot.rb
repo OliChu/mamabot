@@ -65,10 +65,8 @@ def bot(payload)
           connect.send_message(messages, message.conversation_id)
 
         elsif response.intent.slug == "unban-by-title"
-          ingredient = response.entities.select { |entity| entity.name == "ingredient_id" }
-          binding.pry
-          messages = unban_ingredient(ingredient[0].value.tr('id-', ''), username, sender_id)
-          binding.pry
+          ingredient = response.source.gsub(/\AJ'aime cet ingredient id_/, '')
+          messages = unban_ingredient(ingredient, username, sender_id)
           connect.send_message(messages, message.conversation_id)
 
         elsif response.intent.slug == "need-mama"
@@ -77,6 +75,10 @@ def bot(payload)
 
         elsif response.intent.slug == "welcome"
           messages = send_welcome_message
+          connect.send_message(messages, message.conversation_id)
+
+         elsif response.intent.slug == "greetings"
+          messages = send_need_something
           connect.send_message(messages, message.conversation_id)
 
         else
@@ -366,7 +368,7 @@ def send_banned(username, sender_id)
                 {
                   type: 'postback',
                   title: 'Retirer de la liste',
-                  value: "J'aime cet ingrédient id_#{ingredient["title"]}"
+                  value: "J'aime cet ingredient id_#{ingredient["title"]}"
                 }
               ]
             }
@@ -451,9 +453,30 @@ def send_need_something_else
   ]
 end
 
+def send_need_something
+  messages = [
+    {
+      type: 'quickReplies',
+      content:
+      {
+        title: "Bonjour ! Comment puis-je t'aider ?",
+        buttons: [
+          {
+            title: 'Voir des suggestions',
+            value: 'Donnes-moi des idées'
+          },
+          {
+            title: 'Chercher une recette',
+            value: 'activer la recherche'
+          }
+        ]
+      }
+    }
+  ]
+end
+
 def unban_ingredient(title, username, sender_id)
   url = "https://www.foodmama.fr/api/v1/unban?ingredient=#{title}&sender_id=#{sender_id}&userName=#{username}"
-  binding.pry
   open(url).read
   messages = [
         {
