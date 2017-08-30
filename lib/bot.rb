@@ -19,8 +19,16 @@ def bot(payload)
     unless response.intent.nil?
 
       if response.intent.slug
-        if response.intent.slug == "suggest-food"
+        if response.intent.slug == "get-help"
+          messages = send_options
+          connect.send_message(messages, message.conversation_id)
+
+        elsif response.intent.slug == "suggest-food"
           messages = send_suggestions(username, sender_id)
+          connect.send_message(messages, message.conversation_id)
+
+        elsif response.intent.slug == "select-search"
+          messages = send_search_options
           connect.send_message(messages, message.conversation_id)
 
         elsif response.intent.slug == "food-history"
@@ -100,8 +108,8 @@ def send_suggestions(username, sender_id)
             value: 'Donnes-moi des idées'
           },
           {
-            title: 'Demander à Mama',
-            value: 'Je veux chercher une recette'
+            title: 'Chercher une recette',
+            value: 'activer la recherche'
           }
         ]
       }
@@ -150,7 +158,7 @@ def search_food(query)
             },
             {
               title: 'Chercher ?',
-              value: 'Je veux chercher une recette'
+              value: 'activer la recherche'
             }
           ]
         }
@@ -160,6 +168,23 @@ def search_food(query)
           {
             type: 'carousel',
             content: content
+          },
+          {
+            type: 'quickReplies',
+            content:
+            {
+              title: "...",
+              buttons: [
+                {
+                  title: 'Chercher autre chose',
+                  value: 'activer la recherche'
+                },
+                {
+                  title: 'Des suggestions ?',
+                  value: 'Donnes-moi des idées'
+                }
+              ]
+            }
           }
         ]
   end
@@ -191,7 +216,7 @@ def select_food(recipeId, username, sender_id)
           },
           {
             title: 'Chercher ?',
-            value: 'Je veux chercher une recette'
+            value: 'activer la recherche'
           }
         ]
       }
@@ -240,7 +265,7 @@ def send_history(username, sender_id)
             },
             {
               title: 'Chercher ?',
-              value: 'Je veux chercher une recette'
+              value: 'activer la recherche'
             }
           ]
         }
@@ -253,4 +278,48 @@ def send_history(username, sender_id)
           }
         ]
   end
+end
+
+def send_options
+  messages = [
+      {
+        type: 'quickReplies',
+        content:
+        {
+          title: "Comment puis-je t'aider ?",
+          buttons: [
+            {
+              title: 'Des suggestions ?',
+              value: 'Donnes-moi des idées'
+            },
+            {
+              title: 'Chercher ?',
+              value: 'activer la recherche'
+            }
+          ]
+        }
+      }
+    ]
+end
+
+def send_search_options
+  messages = [
+      {
+        type: 'quickReplies',
+        content:
+        {
+          title: "Que souhaites-tu chercher ?",
+          buttons: [
+            {
+              title: 'par ingrédients',
+              value: 'activer la recherche par ingrédients'
+            },
+            {
+              title: 'par nom',
+              value: 'activer la recherche par nom ou par titre'
+            }
+          ]
+        }
+      }
+    ]
 end
