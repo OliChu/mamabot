@@ -35,6 +35,11 @@ def bot(payload)
           messages = send_history(username, sender_id)
           connect.send_message(messages, message.conversation_id)
 
+        elsif response.intent.slug == "search-title"
+          query = "ingredients[]=" + response.source
+          messages = search_food(query)
+          connect.send_message(messages, message.conversation_id)
+
         elsif response.intent.slug == "search-ingredients"
           query = []
           ingredients = response.entities.select { |entity| entity.name == "ingredient" }
@@ -118,7 +123,8 @@ def send_suggestions(username, sender_id)
 end
 
 def search_food(query)
-  url = "http://www.foodmama.fr/api/v1/search?#{query}"
+  encoded_url = URI.encode("http://www.foodmama.fr/api/v1/search?#{query}")
+  url = URI.parse(encoded_url)
   search_serialized = open(url).read
   suggest = JSON.parse(search_serialized)
   content = []
