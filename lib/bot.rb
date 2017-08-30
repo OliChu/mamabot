@@ -60,6 +60,25 @@ def bot(payload)
           messages = select_food(response.get_memory('recette_id').value.gsub(/[^0-9,.]/, ""), username, sender_id)
           connect.send_message(messages, message.conversation_id)
 
+        elsif response.intent.slug == "banned-ingredients"
+          messages = send_banned(username, sender_id)
+          connect.send_message(messages, message.conversation_id)
+
+        elsif response.intent.slug == "unban-by-title"
+          ingredient = response.entities.select { |entity| entity.name == "ingredient_id" }
+          binding.pry
+          messages = unban_ingredient(ingredient[0].value.tr('id-', ''), username, sender_id)
+          binding.pry
+          connect.send_message(messages, message.conversation_id)
+
+        elsif response.intent.slug == "need-mama"
+          messages = send_need_something_else
+          connect.send_message(messages, message.conversation_id)
+
+        elsif response.intent.slug == "welcome"
+          messages = send_welcome_message
+          connect.send_message(messages, message.conversation_id)
+
         else
           replies = response.replies.map{ |r| { type: 'text', content: r } }
           connect.send_message(replies, message.conversation_id)
@@ -98,6 +117,10 @@ def send_suggestions(username, sender_id)
           }
   end
   messages = [
+     {
+      type: 'text',
+      content: "Mama te propose 2 bonnes idées :"
+    },
     {
       type: 'carousel',
       content: content
@@ -323,6 +346,155 @@ def send_search_options
             {
               title: 'par nom',
               value: 'activer la recherche par nom ou par titre'
+            }
+          ]
+        }
+      }
+    ]
+end
+
+def send_banned(username, sender_id)
+  url = "https://www.foodmama.fr/api/v1/banned?sender_id=#{sender_id}&userName=#{username}"
+  banned_serialized = open(url).read
+  banned = JSON.parse(banned_serialized)
+  content = []
+  banned["ingredients"].each do |ingredient|
+            content << {
+              title: "#{ingredient["title"]}",
+              imageUrl: "#{ingredient["imageUrl"]}",
+              buttons: [
+                {
+                  type: 'postback',
+                  title: 'Retirer de la liste',
+                  value: "J'aime cet ingrédient id_#{ingredient["title"]}"
+                }
+              ]
+            }
+    end
+  if content.empty?
+     messages = [
+      {
+        type: 'text',
+        content: "Il n'y a rien ici, on dirait que tu aimes tout 🥕🍖🧀🍑🍞🍄🥒!!"
+      },
+      {
+        type: 'quickReplies',
+        content:
+        {
+          title: "Est-ce qu'il y a des ingrédients que tu n'aimes pas ?",
+          buttons: [
+            {
+              title: 'Oui 🤢',
+              value: 'Bannir des ingrédients'
+            },
+            {
+              title: "Non, je t'ai déjà tout dit !",
+              value: "Mama peut encore aider"
+            }
+          ]
+        }
+      }
+    ]
+  else messages = [
+      {
+        type: 'text',
+        content: "Voici les ingrédients que tu n'aimes pas:"
+      },
+      {
+        type: 'carousel',
+        content: content
+      },
+      {
+        type: 'quickReplies',
+        content:
+        {
+          title: "Est-ce qu'il y a d'autres ingrédients que tu n'aimes pas ?",
+          buttons: [
+            {
+              title: 'Oui 🤢',
+              value: 'Bannir des ingrédients'
+            },
+            {
+              title: "Non, c'est bon !",
+              value: "Mama peut encore aider"
+            }
+          ]
+        }
+      }
+    ]
+  end
+end
+
+def send_need_something_else
+  messages = [
+    {
+      type: 'quickReplies',
+      content:
+      {
+        title: "Besoin d'autre chose?",
+        buttons: [
+          {
+            title: 'Non merci !',
+            value: 'merci Mama'
+          },
+         {
+            title: 'Suggestions ?',
+            value: 'Donnes-moi des idées'
+          },
+          {
+            title: 'Chercher ?',
+            value: 'activer la recherche'
+          }
+        ]
+      }
+    }
+  ]
+end
+
+def unban_ingredient(title, username, sender_id)
+  url = "https://www.foodmama.fr/api/v1/unban?ingredient=#{title}&sender_id=#{sender_id}&userName=#{username}"
+  binding.pry
+  open(url).read
+  messages = [
+        {
+          type: 'text',
+          content: "Ok !"
+        },
+      {
+        type: 'quickReplies',
+        content:
+        {
+          title: "...",
+          buttons: [
+            {
+              title: 'Afficher mes préférences',
+              value: "ingrédients que je n'aime pas"
+            }
+          ]
+        }
+      }
+      ]
+end
+
+def send_welcome_message
+    messages = [
+      {
+        type: 'text',
+        content: "Bonjour je suis Mama et je vais t'aider à trouver très facilement quoi manger avec des suggestions aux petits oignons 🍲🥑🍅🍳💚!"
+      },
+      {
+        type: 'quickReplies',
+        content:
+        {
+          title: "Par quoi veux-tu commencer ?",
+          buttons: [
+            {
+              title: 'Des suggestions ?',
+              value: 'Donnes-moi des idées'
+            },
+            {
+              title: 'Chercher une recette ?',
+              value: 'activer la recherche'
             }
           ]
         }
