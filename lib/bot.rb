@@ -33,7 +33,14 @@ def bot(payload)
           connect.send_message(messages, message.conversation_id)
 
         elsif response.intent.slug == "search-food"
-          query = "ingredients[]=" + response.source
+          query = []
+          ingredients = response.entities.select { |entity| entity.name == "ingredient" }
+          food_types = response.entities.select { |entity| entity.name == "food-type" }
+          emojis = response.entities.select { |entity| entity.name == "emoji" }
+          ingredients.each { |entity| query << "ingredients[]=#{entity.value}" }
+          food_types.each { |entity| query << "ingredients[]=#{entity.value}" }
+          emojis.each { |entity| query << "ingredients[]=#{entity.description}" }
+          query = query.join("&")
           messages = search_food(query)
           connect.send_message(messages, message.conversation_id)
 
@@ -509,18 +516,16 @@ end
         # elsif response.intent.slug == "select-search"
         #   messages = send_search_options
         #   connect.send_message(messages, message.conversation_id)
-        # elsif response.intent.slug == "search-ingredients"
-        #   query = []
-        #   ingredients = response.entities.select { |entity| entity.name == "ingredient" }
-        #   emojis = response.entities.select { |entity| entity.name == "emoji" }
-        #   if (ingredients.any?)
-        #     ingredients.each { |entity| query << "ingredients[]=#{entity.value}" }
-        #     query = query.join("&")
-        #     messages = search_food(query)
-        #     connect.send_message(messages, message.conversation_id)
-        #   elsif (emojis.any?)
-        #     emojis.each { |entity| query << "ingredients[]=#{entity.description}" }
-        #     query = query.join("&")
-        #     messages = search_food(query)
-        #     connect.send_message(messages, message.conversation_id)
-        #   end
+
+          # if (ingredients.any?)
+          #   ingredients.each { |entity| query << "ingredients[]=#{entity.value}" }
+          #   query = query.join("&")
+          #   messages = search_food(query)
+          #   connect.send_message(messages, message.conversation_id)
+          # end
+          # if (emojis.any?)
+          #   emojis.each { |entity| query << "ingredients[]=#{entity.description}" }
+          #   query = query.join("&")
+          #   messages = search_food(query)
+          #   connect.send_message(messages, message.conversation_id)
+          # end
