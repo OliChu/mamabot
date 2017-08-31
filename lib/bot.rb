@@ -217,7 +217,7 @@ def select_food(recipeId, username, sender_id)
   return messages = [
     {
       type: 'text',
-      content: selected_food["title"] + ":\n🍴" + selected_food["servings"] +" pers.\n" + selected_food_ingredients,
+      content: selected_food["title"] + ": \n(🍴" + selected_food["servings"].to_s + " pers.)\n" + selected_food_ingredients,
     },
     {
       type: 'quickReplies',
