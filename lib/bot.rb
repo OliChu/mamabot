@@ -131,7 +131,7 @@ def send_suggestions(username, sender_id)
       type: 'quickReplies',
       content:
       {
-        title: "...",
+        title: "🍽️",
         buttons: [
           {
             title: 'Autres suggestions ?',
@@ -204,7 +204,7 @@ def search_food(query)
             type: 'quickReplies',
             content:
             {
-              title: "...",
+              title: "🍽️",
               buttons: [
                 {
                   title: 'Chercher autre chose',
@@ -288,7 +288,7 @@ def send_history(username, sender_id)
         type: 'quickReplies',
         content:
         {
-          title: "...",
+          title: "🍽️",
           buttons: [
             {
               title: 'Des suggestions ?',
