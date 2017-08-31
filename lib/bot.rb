@@ -27,7 +27,6 @@ def bot(payload)
           messages = send_suggestions(username, sender_id)
           connect.send_message(messages, message.conversation_id)
 
-
         elsif response.intent.slug == "food-history"
           messages = send_history(username, sender_id)
           connect.send_message(messages, message.conversation_id)
@@ -217,7 +216,7 @@ def select_food(recipeId, username, sender_id)
   return messages = [
     {
       type: 'text',
-      content: selected_food["title"] + ": \n(🍴" + selected_food["servings"].to_s + " pers.)\n" + selected_food_ingredients,
+      content: selected_food["title"] + "\n\nListe de courses pour" + selected_food["servings"].to_s + " 🍴\n" + selected_food_ingredients,
     },
     {
       type: 'quickReplies',

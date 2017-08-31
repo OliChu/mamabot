@@ -1,0 +1,33 @@
+curl -X GET "https://graph.facebook.com/v2.6/me/messenger_profile?fields=get_started&access_token=EAAQ8WojafcoBAJwar9QxgscqUH5ZAfMhbMvwwF227qB5byRolzPwBTnXCWj9Edj5YQ2a0oOsd0eiSquJFbBKpfaaUX2Gp3oZApaJ9hZBDZBzCHiyfB6iYQLMOTESCFogRV9VUyrIzvpxWEC78pUqZCzUCSNqjWxmTT85RvfQZAkwZDZD"
+
+
+{"data":
+[{"persistent_menu":[{"locale":"default","composer_input_disabled":false,"call_to_actions":[{"type":"postback","title":"\ud83d\udc9a Suggestions de Mama !","payload":"Donnes-moi des id\u00e9es"},{"type":"postback","title":"\ud83d\ude0b Mes derni\u00e8res recettes","payload":"mes derni\u00e8res recettes"},{"type":"postback","title":"\ud83d\udcdd Mes pr\u00e9f\u00e9rences","payload":"ingr\u00e9dients que je n'aime pas"}]}]}]}%
+
+
+curl -X POST -H "Content-Type: application/json" -d '{
+  "persistent_menu":[
+    {
+    "locale":"default",
+    "composer_input_disabled":false,
+    "call_to_actions":[
+        {
+          "type":"postback",
+          "title":"💚 Suggestions de Mama !",
+          "payload":"Donne-moi des idées"
+        },
+        {
+          "type":"postback",
+          "title":"😋 Mes dernières recettes",
+          "payload":"mes dernières recettes"
+        }
+      ]
+    }
+  ]
+}' "https://graph.facebook.com/v2.6/me/messenger_profile?fields=persistent_menu&access_token=EAAQ8WojafcoBAJwar9QxgscqUH5ZAfMhbMvwwF227qB5byRolzPwBTnXCWj9Edj5YQ2a0oOsd0eiSquJFbBKpfaaUX2Gp3oZApaJ9hZBDZBzCHiyfB6iYQLMOTESCFogRV9VUyrIzvpxWEC78pUqZCzUCSNqjWxmTT85RvfQZAkwZDZD"
+
+curl -X POST -H "Content-Type: application/json" -d '{
+    "get_started":{
+      "payload":"GET_STARTED_PAYLOAD"
+    }
+  }' "https://graph.facebook.com/v2.6/me/messenger_profile?fields=get_started&access_token=EAAQ8WojafcoBAJwar9QxgscqUH5ZAfMhbMvwwF227qB5byRolzPwBTnXCWj9Edj5YQ2a0oOsd0eiSquJFbBKpfaaUX2Gp3oZApaJ9hZBDZBzCHiyfB6iYQLMOTESCFogRV9VUyrIzvpxWEC78pUqZCzUCSNqjWxmTT85RvfQZAkwZDZD"
