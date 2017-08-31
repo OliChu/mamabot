@@ -37,25 +37,6 @@ def bot(payload)
           messages = search_food(query)
           connect.send_message(messages, message.conversation_id)
 
-        # elsif response.intent.slug == "select-search"
-        #   messages = send_search_options
-        #   connect.send_message(messages, message.conversation_id)
-        # elsif response.intent.slug == "search-ingredients"
-        #   query = []
-        #   ingredients = response.entities.select { |entity| entity.name == "ingredient" }
-        #   emojis = response.entities.select { |entity| entity.name == "emoji" }
-        #   if (ingredients.any?)
-        #     ingredients.each { |entity| query << "ingredients[]=#{entity.value}" }
-        #     query = query.join("&")
-        #     messages = search_food(query)
-        #     connect.send_message(messages, message.conversation_id)
-        #   elsif (emojis.any?)
-        #     emojis.each { |entity| query << "ingredients[]=#{entity.description}" }
-        #     query = query.join("&")
-        #     messages = search_food(query)
-        #     connect.send_message(messages, message.conversation_id)
-        #   end
-
         elsif response.intent.slug == "search-by-id"
           messages = select_food(response.get_memory('recette_id').value.gsub(/[^0-9,.]/, ""), username, sender_id)
           connect.send_message(messages, message.conversation_id)
@@ -229,7 +210,7 @@ def select_food(recipeId, username, sender_id)
   return messages = [
     {
       type: 'text',
-      content: selected_food["title"] + ":\n(🍴 2 pers.)\n" + selected_food_ingredients,
+      content: selected_food["title"] + ":\n🍴" + selected_food["servings"] +" pers.\n" + selected_food_ingredients,
     },
     {
       type: 'quickReplies',
@@ -333,27 +314,6 @@ def send_options
     ]
 end
 
-# def send_search_options
-#   messages = [
-#       {
-#         type: 'quickReplies',
-#         content:
-#         {
-#           title: "Que souhaites-tu chercher ?",
-#           buttons: [
-#             {
-#               title: 'par ingrédients',
-#               value: 'activer la recherche par ingrédients'
-#             },
-#             {
-#               title: 'par nom',
-#               value: 'activer la recherche par nom ou par titre'
-#             }
-#           ]
-#         }
-#       }
-#     ]
-# end
 
 def send_banned(username, sender_id)
   url = "https://www.foodmama.fr/api/v1/banned?sender_id=#{sender_id}&userName=#{username}"
@@ -524,3 +484,43 @@ def send_welcome_message
       }
     ]
 end
+
+        # def send_search_options
+        #   messages = [
+        #       {
+        #         type: 'quickReplies',
+        #         content:
+        #         {
+        #           title: "Que souhaites-tu chercher ?",
+        #           buttons: [
+        #             {
+        #               title: 'par ingrédients',
+        #               value: 'activer la recherche par ingrédients'
+        #             },
+        #             {
+        #               title: 'par nom',
+        #               value: 'activer la recherche par nom ou par titre'
+        #             }
+        #           ]
+        #         }
+        #       }
+        #     ]
+        # end
+        # elsif response.intent.slug == "select-search"
+        #   messages = send_search_options
+        #   connect.send_message(messages, message.conversation_id)
+        # elsif response.intent.slug == "search-ingredients"
+        #   query = []
+        #   ingredients = response.entities.select { |entity| entity.name == "ingredient" }
+        #   emojis = response.entities.select { |entity| entity.name == "emoji" }
+        #   if (ingredients.any?)
+        #     ingredients.each { |entity| query << "ingredients[]=#{entity.value}" }
+        #     query = query.join("&")
+        #     messages = search_food(query)
+        #     connect.send_message(messages, message.conversation_id)
+        #   elsif (emojis.any?)
+        #     emojis.each { |entity| query << "ingredients[]=#{entity.description}" }
+        #     query = query.join("&")
+        #     messages = search_food(query)
+        #     connect.send_message(messages, message.conversation_id)
+        #   end
